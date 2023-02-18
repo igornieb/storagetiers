@@ -15,6 +15,7 @@ class Tier(models.Model):
         for val in val_list:
             if val.isdigit():
                 res.append(int(val))
+        res.sort()
         return res
 
     name = models.CharField(max_length=100)
@@ -35,11 +36,22 @@ class Account(models.Model):
 
 class Picture(models.Model):
     # this model stores user uploaded pictures
+    # TODO validate extensions
     def __str__(self):
         return f"{self.pk} - {self.owner}"
 
     def upload_to(self, filename):
         return f"{MEDIA_ROOT}/{self.owner.user}/{filename}"
 
+    def get_sizes(self):
+        # returns list of allowed heights
+        val_list = str(self.owner.tier.sizes_allowed).split(" ")
+        res = []
+        for val in val_list:
+            if val.isdigit():
+                res.append(int(val))
+        res.sort()
+        return res
+
     owner = models.ForeignKey(Account, on_delete=models.CASCADE)
-    img = models.ImageField(upload_to=upload_to,)
+    img = models.ImageField(upload_to=upload_to)
