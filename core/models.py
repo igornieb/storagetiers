@@ -1,5 +1,6 @@
 from django.contrib.auth.models import User
 from django.db import models
+from django.urls import reverse
 from core.utilis import validate_sizes_allowed
 from storagetiers.settings import MEDIA_ROOT
 
@@ -33,6 +34,9 @@ class Picture(models.Model):
     def upload_to(self, filename):
         return f"{MEDIA_ROOT}/{self.owner.user}/{filename}"
 
+    def get_absolute_url(self):
+        return reverse("picture-details", kwargs={'pk': self.pk, "height":200}), reverse("picture-details", kwargs={'pk': self.pk})
+
     def get_sizes(self):
         # returns list of allowed heights
         val_list = str(self.owner.tier.sizes_allowed).split(" ")
@@ -42,9 +46,9 @@ class Picture(models.Model):
                 res.append(int(val))
         res.sort()
         if self.owner.tier.allow_original:
-            res.append('original')
+            res.append('')
         if self.owner.tier.allow_link:
-            res.append('link')
+            res.append('linkable')
         return res
 
     owner = models.ForeignKey(Account, on_delete=models.CASCADE)
