@@ -17,6 +17,7 @@ class PictureList(APIView):
         return [permissions.IsAuthenticated()]
 
     def get_queryset(self):
+        # returns list of Pictures that belong to given Account
         account = Account.objects.get(user=self.request.user)
         pictures = Picture.objects.filter(owner=account)
         return pictures
@@ -47,6 +48,7 @@ class PictureDetails(APIView):
             raise Http404
 
     def get(self, request, pk, height=None):
+        # returns image in given size
         picture = self.get_object(pk)
         if height:
             if height in picture.get_sizes():
