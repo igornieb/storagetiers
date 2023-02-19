@@ -8,19 +8,9 @@ class Tier(models.Model):
     def __str__(self):
         return self.name
 
-    def get_sizes(self):
-        # returns list of allowed heights
-        val_list = str(self.sizes_allowed).split(" ")
-        res = []
-        for val in val_list:
-            if val.isdigit():
-                res.append(int(val))
-        res.sort()
-        return res
-
     name = models.CharField(max_length=100)
     sizes_allowed = models.CharField(max_length=100, validators=[validate_sizes_allowed])
-    store_original = models.BooleanField(default=False)
+    allow_original = models.BooleanField(default=False)
     allow_link = models.BooleanField(default=False)
 
 
@@ -51,6 +41,10 @@ class Picture(models.Model):
             if val.isdigit():
                 res.append(int(val))
         res.sort()
+        if self.owner.tier.allow_original:
+            res.append('original')
+        if self.owner.tier.allow_link:
+            res.append('link')
         return res
 
     owner = models.ForeignKey(Account, on_delete=models.CASCADE)
