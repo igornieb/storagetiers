@@ -3,8 +3,8 @@ from core.models import Picture
 
 
 class PictureSerializer(serializers.ModelSerializer):
-    # TODO get_absolute_url
+    urls = serializers.URLField(source='get_absolute_url', read_only=True)
 
     class Meta:
         model = Picture
-        fields = ['get_sizes','owner', 'img']
+        fields = ['owner', 'urls', 'get_sizes']
