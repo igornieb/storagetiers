@@ -12,3 +12,7 @@ class AccountAdmin(admin.ModelAdmin):
 @admin.register(Picture)
 class PictureAdmin(admin.ModelAdmin):
     list_display = ('pk', 'owner',)
+
+@admin.register(TimePicture)
+class TimePictureAdmin(admin.ModelAdmin):
+    list_display = ('pk', 'picture', 'expires', 'expired')

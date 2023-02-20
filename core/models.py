@@ -1,7 +1,10 @@
+import uuid
+from django.utils import timezone
+from datetime import timedelta, datetime
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
-from core.utilis import validate_sizes_allowed
+from core.utilis import validate_sizes_allowed, validate_time_allowed
 from storagetiers.settings import MEDIA_ROOT
 
 
@@ -29,13 +32,21 @@ class Picture(models.Model):
     # this model stores user uploaded pictures
     # TODO validate extensions
     def __str__(self):
-        return f"{self.pk} - {self.owner}"
+        return f"{self.name} - {self.owner}"
 
     def upload_to(self, filename):
         return f"{MEDIA_ROOT}/{self.owner.user}/{filename}"
 
     def get_absolute_url(self):
-        return reverse("picture-details", kwargs={'pk': self.pk, "height":200}), reverse("picture-details", kwargs={'pk': self.pk})
+        # get posible res, create dicts
+        heights = self.get_sizes()
+        links = []
+        for value in heights:
+            if isinstance(value, int):
+                links.append(reverse("picture-details", kwargs={'pk': self.pk, "height": value}))
+            if value == "":
+                links.append(reverse("picture-details", kwargs={'pk': self.pk}))
+        return links
 
     def get_sizes(self):
         # returns list of allowed heights
@@ -51,5 +62,46 @@ class Picture(models.Model):
             res.append('linkable')
         return res
 
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=100)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE)
     img = models.ImageField(upload_to=upload_to)
+
+
+class TimePicture(models.Model):
+    def __str__(self):
+        return f"{self.picture} {self.created} {self.expires}"
+
+    def get_absolute_url(self):
+        return reverse("timelink", kwargs={'pk': self.pk})
+
+    def is_expired(self):
+        print(timezone.now())
+        print(self.created + timedelta(seconds=self.time) - timezone.now())
+        if self.created + timedelta(seconds=self.time) > timezone.now():
+            return False
+        else:
+            self.expired = True
+            self.save()
+            return True
+
+    def time_left(self):
+        self.is_expired()
+        time_left = self.created + timedelta(seconds=self.time) - timezone.now()
+        if time_left < 0:
+            self.expired = True
+            self.save()
+            return "Expired"
+        return time_left
+
+    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    picture = models.ForeignKey(Picture, on_delete=models.CASCADE)
+    created = models.DateTimeField(default=timezone.now)
+    time = models.IntegerField(null=False, validators=[validate_time_allowed])
+    expires = models.DateTimeField(default=timezone.now, null=True)
+    expired = models.BooleanField(default=False)
+
+    def save(self, *args, **kwargs):
+        self.expires = self.created + timedelta(seconds=self.time)
+        super(TimePicture, self).save(*args, **kwargs)
+
