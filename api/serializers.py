@@ -13,7 +13,7 @@ class PictureSerializer(serializers.ModelSerializer):
 class PictureAddSerializer(serializers.ModelSerializer):
     class Meta:
         model = Picture
-        fields = ['owner', 'name', 'img']
+        fields = ['name', 'img']
 
 
 class TimePictureSerializer(serializers.ModelSerializer):
@@ -22,4 +22,12 @@ class TimePictureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = TimePicture
-        fields = ['url', 'picture', 'time_left']
+        fields = ['url', 'picture', 'time', 'time_left']
+
+
+class TimePictureShortSerializer(serializers.ModelSerializer):
+    url = serializers.URLField(source='get_absolute_url', read_only=True)
+    picture = PictureSerializer(read_only=True, many=False)
+    class Meta:
+        model = TimePicture
+        fields = ['url', 'picture', 'time']
