@@ -12,7 +12,7 @@ class Tier(models.Model):
     def __str__(self):
         return self.name
 
-    name = models.CharField(max_length=100)
+    name = models.CharField(max_length=100, unique=True)
     sizes_allowed = models.CharField(max_length=100, validators=[validate_sizes_allowed])
     allow_original = models.BooleanField(default=False)
     allow_link = models.BooleanField(default=False)
@@ -65,7 +65,7 @@ class Picture(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=100)
     owner = models.ForeignKey(Account, on_delete=models.CASCADE)
-    img = models.ImageField(upload_to=upload_to)
+    img = models.ImageField(upload_to=upload_to, null=False, blank=False)
 
 
 class TimePicture(models.Model):
@@ -87,7 +87,7 @@ class TimePicture(models.Model):
 
     def time_left(self):
         self.is_expired()
-        time_left = self.created + timedelta(seconds=self.time) - timezone.now()
+        time_left = (self.created + timedelta(seconds=self.time) - timezone.now()).total_seconds()
         if time_left < 0:
             self.expired = True
             self.save()
