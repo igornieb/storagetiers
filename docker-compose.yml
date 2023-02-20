@@ -9,11 +9,11 @@ services:
       - POSTGRES_PASSWORD=admint_storagetier
   web:
     build: .
-    command: python manage.py migrate && python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000
     environment:
       - SECRET_KEY=my_verylong_secret_key=django--l*j=!pe!cz^p3@bglma!$^rfp6=n-7$)z4=-r1v6%e*#ar^l=4
       - DEBUG=1
-      - DB_HOST=db
+      - DB_HOST=postgres
       - DB_NAME=storagetier
       - DB_USER=storagetier_admin
       - DB_PASS=admint_storagetier
