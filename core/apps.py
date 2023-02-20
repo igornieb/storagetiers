@@ -3,12 +3,14 @@ from django.db.models.signals import post_migrate
 
 
 def create_base_tiers(**kwargs):
-    # TODO finish
     from core.models import Tier
     try:
-        Tier.objects.all()
+        Tier.objects.create(name="Basic", sizes_allowed="200")
+        Tier.objects.create(name="Premium", sizes_allowed="200, 400", allow_original=True)
+        Tier.objects.create(name="Enterprise", sizes_allowed="200 400", allow_original=True, allow_link=True)
+        print("Tiers created")
     except:
-        pass
+        print("Tiers already created")
 
 
 class CoreConfig(AppConfig):
