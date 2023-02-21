@@ -29,7 +29,7 @@ class PictureList(APIView):
         serializer = PictureSerializer(data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save(owner=account)
-            return Response(serializer.data)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -73,7 +73,7 @@ class PictureDetails(APIView):
         serializer = TimePictureShortSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(picture=picture)
-            return Response(serializer.data)
+            return Response(serializer.data, status.HTTP_201_CREATED)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
