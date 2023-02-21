@@ -18,6 +18,8 @@ services:
       - DB_NAME=storagetier
       - DB_USER=storagetier_admin
       - DB_PASS=admint_storagetier
+      - ACCESS_TOKEN_LIFETIME=20
+      - REFRESH_TOKEN_LIFETIME=1
     volumes:
       - .:/code/
     ports:

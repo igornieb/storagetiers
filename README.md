@@ -4,12 +4,61 @@
 ## Set-up
 You will need to install docker.
 
-Run termina in project directory and type `docker-compose up`.
+Run terminal in project directory and type `docker-compose up`.
 
 ## API endpoints
 Permissions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time. Then temporary link is generated and image is made available to everyone that has this link.
 
 Authentication - JWT token is used for authentication across API views.
+
+### /api/token/
+
+#### POST
+
+Returns access and refresh tokens
+
+Success code: ```200```
+
+Error code: ```401 - No account found with the given credentials```
+
+Example input:
+```
+{
+    "username": "user",
+    "password": "user_password"
+}
+```
+
+Example output:
+```
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY3NzA3MzU3OSwiaWF0IjoxNjc2OTg3MTc5LCJqdGkiOiIzNzUzOGZkYjJkNWM0NmM5YmE1NjhiMDVlZjg2MTM3ZiIsInVzZXJfaWQiOjF9.mp8xlGAkUoBDDZg1gAzWF2fuok685lv5ZVDtRfwYCQk",
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc2OTg4Mzc5LCJpYXQiOjE2NzY5ODcxNzksImp0aSI6ImMyZDVmMTIxNGFkODRhZDJiMzQ2NmU1ZWNjNjhhOGM4IiwidXNlcl9pZCI6MX0.nSFZqaG0Hd1AVjWsruYFudznSJVxKwNsAuVW64NMxpc"
+}
+```
+
+### /api/token/refresh/
+
+#### POST
+
+Returns new access token
+
+Success code: ```200```
+
+Error code: ```401 - Token is invalid or expired```
+
+Example input:
+```
+{
+    "refresh": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoicmVmcmVzaCIsImV4cCI6MTY3NzA3MzU3OSwiaWF0IjoxNjc2OTg3MTc5LCJqdGkiOiIzNzUzOGZkYjJkNWM0NmM5YmE1NjhiMDVlZjg2MTM3ZiIsInVzZXJfaWQiOjF9.mp8xlGAkUoBDDZg1gAzWF2fuok685lv5ZVDtRfwYCQk"
+}
+```
+Example output:
+```
+{
+    "access": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0b2tlbl90eXBlIjoiYWNjZXNzIiwiZXhwIjoxNjc2OTg5MTcyLCJpYXQiOjE2NzY5ODcxNzksImp0aSI6IjVlYTBjMmQxOGZmMjRkNTA4ODBiNjNhOTkxOTA5ODU1IiwidXNlcl9pZCI6MX0.sULHx8PqzRINhdZrpS0B806ZSi_Cs1vcsSLSOGRee_k"
+}
+```
 
 ### /api/pictures
 
