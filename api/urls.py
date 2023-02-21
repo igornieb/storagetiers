@@ -8,6 +8,6 @@ urlpatterns = [
     path('picture/<uuid:pk>', views.PictureDetails.as_view(), name='picture-details'),
     path('picture/<uuid:pk>/<int:height>', views.PictureDetails.as_view(), name='picture-details'),
     path('timelink/<uuid:pk>', views.TimePictureDetails.as_view(), name='timelink'),
-    path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
-    path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('token/', TokenObtainPairView.as_view(), name='token-obtain-pair'),
+    path('token/refresh/', TokenRefreshView.as_view(), name='token-refresh'),
 ]
