@@ -8,7 +8,7 @@ Run terminal in project directory and type `docker compose up` command. If you w
 
 ## Tests
 
-To run tests enter storagetiers-web console and type in `python manage.py test`
+To run tests enter storagetiers-web console and type in `python manage.py test`.
 
 ## API endpoints
 Permissions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time (create specific link). Then temporary link is generated and image is made available to everyone that has this link.
