@@ -175,4 +175,24 @@ class PictureDetailsTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
+class TimePictureDetailsTest(APITestCase):
+    # tests TimePictureDetails view
+    def setUp(self):
+        self.user = User.objects.create_user(username='admin', password='admin')
+        self.token = Token.objects.create(user=self.user)
+        self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
+        picture = Picture.objects.create(owner=Account.objects.get(user=self.user), img="imgmock.png")
+        picture.img = SimpleUploadedFile(name='test_image.jpg', content=open("test_image.png", 'rb').read(),
+                                         content_type='image/jpeg')
+        picture.save()
+        self.picture_good = TimePicture.objects.create(picture=picture, time=400)
+        self.picture_bad = TimePicture.objects.create(picture=picture, time=0)
+
+    def test_method_get_active(self):
+        response = self.client.get(reverse('timelink', kwargs={'pk': self.picture_good.id}))
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
+
+    def test_method_get_expired(self):
+        response = self.client.get(reverse('timelink', kwargs={'pk': self.picture_bad.id}))
+        self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
