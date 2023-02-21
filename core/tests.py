@@ -2,7 +2,6 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from datetime import timedelta, datetime
-
 from core.models import Account, User, Tier, Picture, TimePicture
 
 
@@ -47,6 +46,19 @@ class TierModelTest(TestCase):
         expected_sizes_allowed = [200, 300, 800]
         self.assertEqual(tier.get_sizes(), expected_sizes_allowed)
 
+    def test_validation_sizes_allowed_error(self):
+        invalid_sizes = ["200;800", "200, 800", "300i"]
+        with self.assertRaises(ValidationError):
+            for sizes in invalid_sizes:
+                tier = Tier(name="test", sizes_allowed=sizes)
+                tier.full_clean()
+
+    def test_validation_sizes_allowed(self):
+        valid_sizes = ["200 800", "200 800 1000", "300"]
+        for sizes in valid_sizes:
+            tier = Tier(name="test", sizes_allowed=sizes)
+            tier.full_clean()
+
 
 class PictureModelTest(TestCase):
     @classmethod
@@ -84,6 +96,19 @@ class TimePictureModelTest(TestCase):
         a = Account.objects.get(user=u)
         cls.picture = Picture.objects.create(name="TestPicture", img="", owner=a)
         TimePicture.objects.create(picture=cls.picture, time=400)
+
+    def test_validation_time_field_error(self):
+        invalid_times = [399, 30001, 20]
+        with self.assertRaises(ValidationError):
+            for time in invalid_times:
+                picture1 = TimePicture(picture=self.picture, time=time)
+                picture1.full_clean()
+
+    def test_validation_time_field(self):
+        valid_times = [400, 3000, 300]
+        for time in valid_times:
+            picture1 = TimePicture(picture=self.picture, time=time)
+            picture1.full_clean()
 
     def test_str_representation(self):
         picture = TimePicture.objects.filter(picture=self.picture).first()
