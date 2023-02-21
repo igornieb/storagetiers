@@ -4,6 +4,9 @@ from rest_framework import permissions, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
 from rest_framework.views import APIView
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
+from django.views.decorators.vary import vary_on_headers
 from core.models import Account, Picture
 from api.serializers import *
 from PIL import Image
@@ -19,6 +22,8 @@ class PictureList(APIView):
         pictures = Picture.objects.filter(owner=account)
         return pictures
 
+    @method_decorator(cache_page(60 * 60))
+    @method_decorator(vary_on_headers("Authorization", ))
     def get(self, request):
         pictures = self.get_queryset()
         serializer = PictureSerializer(pictures, many=True)
@@ -45,6 +50,7 @@ class PictureDetails(APIView):
         except Picture.DoesNotExist:
             raise Http404
 
+    @method_decorator(cache_page(60 * 60))
     def get(self, request, pk, height=None):
         # returns image in given size
         picture = self.get_object(pk)
@@ -101,6 +107,7 @@ class TimePictureDetails(APIView):
         except TimePicture.DoesNotExist:
             raise Http404
 
+    @method_decorator(cache_page(60 * 20))
     def get(self, request, pk):
         # returns shared image or 404 if image is already expired
         time_picture = self.get_object(pk)
