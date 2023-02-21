@@ -1,4 +1,5 @@
 from django.http import Http404, HttpResponse
+from django.utils import timezone
 from rest_framework import permissions, status
 from rest_framework.exceptions import PermissionDenied
 from rest_framework.response import Response
@@ -25,10 +26,10 @@ class PictureList(APIView):
 
     def post(self, request):
         account = Account.objects.get(user=self.request.user)
-        serializer = PictureAddSerializer(data=request.data, partial=False)
+        serializer = PictureSerializer(data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save(owner=account)
-            return Response(status=status.HTTP_201_CREATED)
+            return Response(serializer.data)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -84,7 +85,7 @@ class TimePictureList(APIView):
     def get_queryset(self):
         # returns list of TimePictures that belong to given Account
         account = Account.objects.get(user=self.request.user)
-        pictures = TimePicture.objects.filter(picture__owner=account)
+        pictures = TimePicture.objects.filter(picture__owner=account, expires__gt=timezone.now())
         return pictures
 
     def get(self, request):
@@ -97,7 +98,7 @@ class TimePictureDetails(APIView):
     def get_object(self, pk):
         try:
             return TimePicture.objects.get(pk=pk)
-        except Picture.DoesNotExist:
+        except TimePicture.DoesNotExist:
             raise Http404
 
     def get(self, request, pk):
