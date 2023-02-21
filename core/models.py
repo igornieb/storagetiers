@@ -86,9 +86,7 @@ class TimePicture(models.Model):
         return reverse("timelink", kwargs={'pk': self.pk})
 
     def is_expired(self):
-        print(timezone.now())
-        print(self.created + timedelta(seconds=self.time) - timezone.now())
-        if self.created + timedelta(seconds=self.time) > timezone.now():
+        if self.expires > timezone.now():
             return False
         else:
             self.expired = True
@@ -96,8 +94,7 @@ class TimePicture(models.Model):
             return True
 
     def time_left(self):
-        self.is_expired()
-        time_left = (self.created + timedelta(seconds=self.time) - timezone.now()).total_seconds()
+        time_left = (self.expires - timezone.now()).total_seconds()
         if time_left < 0:
             self.expired = True
             self.save()
