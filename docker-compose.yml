@@ -7,9 +7,12 @@ services:
       - POSTGRES_DB=storagetier
       - POSTGRES_USER=storagetier_admin
       - POSTGRES_PASSWORD=admint_storagetier
+  redis:
+    image: redis
+    container_name: redis
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000
+    command: python manage.py runserver 0.0.0.0:8000 && celery -A storagetiers beat -l INFO
     entrypoint: /code/entrypoint.sh
     environment:
       - SECRET_KEY=my_verylong_secret_key=django--l*j=!pe!cz^p3@bglma!$^rfp6=n-7$)z4=-r1v6%e*#ar^l=4
@@ -26,3 +29,22 @@ services:
       - "8000:8000"
     depends_on:
       - postgres
+  celery:
+    restart: always
+    build:
+      context: .
+    command: celery -A storagetiers worker -l info
+    volumes:
+      - .:/code/
+    environment:
+      - DB_HOST=postgres
+      - DB_NAME=storagetier
+      - DB_USER=storagetier_admin
+      - DB_PASS=admint_storagetier
+    depends_on:
+      - postgres
+      - redis
+      - web
+
+
+

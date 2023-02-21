@@ -4,10 +4,10 @@
 ## Set-up
 You will need to install docker.
 
-Run terminal in project directory and type `docker-compose up`.
+Run terminal in project directory and type `docker compose up`.
 
 ## API endpoints
-Permissions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time. Then temporary link is generated and image is made available to everyone that has this link.
+Permissions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time (create specific link). Then temporary link is generated and image is made available to everyone that has this link.
 
 Authentication - JWT token is used for authentication across API views.
 
@@ -19,7 +19,7 @@ Returns access and refresh tokens
 
 Success code: ```200```
 
-Error code: ```401 - No account found with the given credentials```
+Error code: ```401 - authentication error```
 
 Example input:
 ```
@@ -68,7 +68,7 @@ Returns all Pictures uploaded by logged-in user
 
 Success code: ```200```
 
-Error code: ```403```
+Error code: ```401 - authentication error```
 
 Example output:
 ```
@@ -89,6 +89,13 @@ Uploads new Picture
 
 Success code: `201`
 
+Error codes:
+```
+400 - bad request
+
+401 - authentication error 
+```
+
 Example input:
 
 ```
@@ -97,13 +104,13 @@ Example input:
    "img":"image.jpg",
 }
 ```
-
-Error codes:
-
+Example output:
 ```
-400 - bad request
-
-403 - authorization error 
+{
+    "owner": "admin",
+    "name": "test",
+    "urls": "['/api/picture/b8ce8d79-e07c-43e3-af3e-51416946cfe3/200']"
+}
 ```
 
 ### /api/pictures/shared/
@@ -114,7 +121,7 @@ Returns list of images shared by user
 
 Success code: `201`
 
-Error code: ```403```
+Error code: ```401 - authentication error```
 
 Example output:
 
@@ -123,7 +130,7 @@ Example output:
    {
         "url": "/api/timelink/cc0f072e-ff1a-4691-aa55-9bade77a7a11",
         "picture": {
-            "owner": 1,
+            "owner": admin,
             "name": "honda hrc poster",
             "urls": "['/api/picture/e7362eca-382b-4204-9531-23469b18dbcc/200', '/api/picture/e7362eca-382b-4204-9531-23469b18dbcc/400', '/api/picture/e7362eca-382b-4204-9531-23469b18dbcc']"
         },
@@ -168,7 +175,7 @@ Example output:
 {
     "url": "/api/timelink/0363825a-cb79-45d3-8d93-fbf8118c701b",
     "picture": {
-        "owner": 1,
+        "owner": admin,
         "name": "honda hrc poster",
         "urls": "['/api/picture/e7362eca-382b-4204-9531-23469b18dbcc/200', '/api/picture/e7362eca-382b-4204-9531-23469b18dbcc/400', '/api/picture/e7362eca-382b-4204-9531-23469b18dbcc']"
     },
@@ -188,7 +195,7 @@ Error codes:
 
 ```
 403 - user Tier doesnt allow for this resolution
-403 - authorization error
+401 - authentication error
 ```
 
 ### /api/timelink/{uuid}
