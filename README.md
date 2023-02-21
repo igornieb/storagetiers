@@ -1,10 +1,14 @@
 # storagetiers
-[smh]
+This project uses Django and Django Rest Framework, Celery to run periodic tasks and Redis for cache.
 
 ## Set-up
 You will need to install docker.
 
-Run terminal in project directory and type `docker compose up`.
+Run terminal in project directory and type `docker compose up` command. If you want to turn on scheduled tasks enter storagetiers-web console and type `celery -A storagetiers worker -l INFO`
+
+## Tests
+
+To run tests enter storagetiers-web console and type in `python manage.py test`
 
 ## API endpoints
 Permissions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time (create specific link). Then temporary link is generated and image is made available to everyone that has this link.
