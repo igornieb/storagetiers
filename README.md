@@ -1,12 +1,15 @@
 # storagetiers
 [smh]
 
-## Set-up this project
+## Set-up
+You will need to install docker.
 
-Run `docker-compose up` in terminal. You will need to install docker.
+Run termina in project directory and type `docker-compose up`.
 
 ## API endpoints
-Permisions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time. Then temporary link is generated and image is made available to everyone that has this link.
+Permissions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time. Then temporary link is generated and image is made available to everyone that has this link.
+
+Authentication - JWT token is used for authentication across API views.
 
 ### /api/pictures
 
