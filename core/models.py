@@ -1,7 +1,7 @@
 import uuid
 from django.utils import timezone
-from django.core.validators import FileExtensionValidator
 from datetime import timedelta, datetime
+from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
@@ -12,6 +12,16 @@ from storagetiers.settings import MEDIA_ROOT
 class Tier(models.Model):
     def __str__(self):
         return self.name
+
+    def get_sizes(self):
+        # returns list of allowed heights
+        val_list = self.sizes_allowed.split(" ")
+        res = []
+        for val in val_list:
+            if val.isdigit():
+                res.append(int(val))
+        res.sort()
+        return res
 
     name = models.CharField(max_length=100, unique=True)
     sizes_allowed = models.CharField(max_length=100, validators=[validate_sizes_allowed])
