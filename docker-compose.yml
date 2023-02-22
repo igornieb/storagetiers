@@ -33,7 +33,7 @@ services:
     restart: always
     build:
       context: .
-    command: celery -A storagetiers beat -l INFO && celery -A storagetiers worker -l INFO
+    command: celery -A storagetiers worker -l INFO
     volumes:
       - .:/code/
     environment:
