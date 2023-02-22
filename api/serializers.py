@@ -8,7 +8,7 @@ class PictureSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Picture
-        fields = ['owner', 'name', 'urls', 'img']
+        fields = ['owner', 'name', 'urls']
 
 
 class PictureAddSerializer(serializers.ModelSerializer):

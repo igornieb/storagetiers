@@ -12,7 +12,7 @@ services:
     container_name: redis
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:8000 && celery -A storagetiers worker -l INFO
+    command: python manage.py runserver 0.0.0.0:8000 && celery -A storagetiers beat -l INFO
     entrypoint: /code/entrypoint.sh
     environment:
       - SECRET_KEY=my_verylong_secret_key=django--l*j=!pe!cz^p3@bglma!$^rfp6=n-7$)z4=-r1v6%e*#ar^l=4

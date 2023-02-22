@@ -59,13 +59,23 @@ class PictureListTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_method_post_authenticated_valid(self):
+        img = SimpleUploadedFile(name='test_image.png', content=open("test_image.png", 'rb').read(),
+                                 content_type='image/png')
         data = {
             'name': "test",
-            'img': "nice_image.jpg"
+            'img': img
         }
-        response = self.client.post(self.url, data, format='json')
+        response = self.client.post(self.url, data, format="multipart")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['name'], "test")
+
+    def test_method_post_authenticated_invalid(self):
+        data = {
+            'name': "test",
+            'img': "test_image.png"
+        }
+        response = self.client.post(self.url, data, format="multipart")
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
 
 class TimePictureListTest(APITestCase):

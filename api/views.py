@@ -22,8 +22,6 @@ class PictureList(APIView):
         pictures = Picture.objects.filter(owner=account)
         return pictures
 
-    @method_decorator(cache_page(60 * 60))
-    @method_decorator(vary_on_headers("Authorization", ))
     def get(self, request):
         pictures = self.get_queryset()
         serializer = PictureSerializer(pictures, many=True)
