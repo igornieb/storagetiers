@@ -31,7 +31,7 @@ class PictureList(APIView):
 
     def post(self, request):
         account = Account.objects.get(user=self.request.user)
-        serializer = PictureSerializer(data=request.data, partial=False)
+        serializer = PictureAddSerializer(data=request.data, partial=False)
         if serializer.is_valid():
             serializer.save(owner=account)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
