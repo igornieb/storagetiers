@@ -1,14 +1,27 @@
 # storagetiers
-This project uses Django and Django Rest Framework, Celery to run periodic tasks, Redis for cache.
+
+Backend (Python + Django) Engineer recruitment task.
+
+## Time
+
+This assignment took me around 12 hours from start to finish.
 
 ## Set-up
 You will need to install docker.
 
-Run terminal in project directory and type `docker compose up` command. If you want to turn on scheduled tasks enter storagetiers-web console and type `celery -A storagetiers beat -l INFO`. If you want to run with `DEBUG` off dont forget to collectstatic first.
+Run terminal in project directory and type `docker compose up` command. Django server will start on port `8000`. If you want to turn on scheduled tasks enter storagetiers-web console and type `celery -A storagetiers beat -l INFO`. If you want to run with `DEBUG` off don't forget to collectstatic first.
 
 ## Tests
 
 To run tests enter storagetiers-web terminal and type in `python manage.py test`.
+
+## Periodic tasks
+
+This project uses Celery to run periodic tasks (deleting expired links). They aren't run by default to turn them on enter storagetiers-web container console and type `celery -A storagetiers beat -l INFO`.
+
+## Cache
+
+This project uses Redis for caching views.
 
 ## API endpoints
 
@@ -113,8 +126,10 @@ Example output:
     "owner": "admin",
     "name": "test",
     "urls": "['/api/picture/b8ce8d79-e07c-43e3-af3e-51416946cfe3/200']"
+    "img": "/media/media/admin/hm_92p7R9W.png"
 }
 ```
+Note: Returned img path is accessible only when debug is turned on.
 
 ### /api/pictures/shared/
 
