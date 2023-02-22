@@ -4,7 +4,7 @@ Backend (Python + Django) Engineer recruitment task.
 
 ## Time
 
-This assignment took me around 12 hours from start to finish.
+This assignment took me around 10-12 hours from start to finish.
 
 ## Set-up
 You will need to install docker.
