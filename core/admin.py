@@ -15,4 +15,4 @@ class PictureAdmin(admin.ModelAdmin):
 
 @admin.register(TimePicture)
 class TimePictureAdmin(admin.ModelAdmin):
-    list_display = ('pk', 'picture', 'expires', 'expired')
+    list_display = ('pk', 'picture', 'expires')

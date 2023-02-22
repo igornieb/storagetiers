@@ -85,19 +85,9 @@ class TimePicture(models.Model):
     def get_absolute_url(self):
         return reverse("timelink", kwargs={'pk': self.pk})
 
-    def is_expired(self):
-        if self.expires > timezone.now():
-            return False
-        else:
-            self.expired = True
-            self.save()
-            return True
-
     def time_left(self):
         time_left = (self.expires - timezone.now()).total_seconds()
         if time_left < 0:
-            self.expired = True
-            self.save()
             return "Expired"
         return time_left
 
@@ -106,7 +96,6 @@ class TimePicture(models.Model):
     created = models.DateTimeField(default=timezone.now)
     time = models.IntegerField(null=False, validators=[validate_time_allowed])
     expires = models.DateTimeField(default=timezone.now, null=True)
-    expired = models.BooleanField(default=False)
 
     def save(self, *args, **kwargs):
         self.expires = self.created + timedelta(seconds=self.time)
