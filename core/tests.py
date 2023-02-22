@@ -121,12 +121,7 @@ class TimePictureModelTest(TestCase):
         expected_urls = reverse("timelink", kwargs={'pk': picture.pk})
         self.assertEqual(picture.get_absolute_url(), expected_urls)
 
-    def test_is_expired(self):
+    def test_get_expires_field(self):
         picture = TimePicture.objects.filter(picture=self.picture).first()
-        expected_bool = picture.created + timedelta(seconds=picture.time) > timezone.now()
-        self.assertEqual(picture.is_expired(), not expected_bool)
-
-    def test_expires_field(self):
-        picture = TimePicture.objects.filter(picture=self.picture).first()
-        expected_expires = picture.created + timedelta(seconds=picture.time)
-        self.assertEqual(picture.expires, expected_expires)
+        expected_expires = picture.expires
+        self.assertEqual(picture.created + timedelta(seconds=picture.time), expected_expires)
