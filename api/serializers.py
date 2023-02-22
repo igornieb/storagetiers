@@ -19,11 +19,6 @@ class PictureAddSerializer(serializers.ModelSerializer):
         model = Picture
         fields = ['owner', 'name', 'urls', 'img']
 
-    def get_fields(self, *args, **kwargs):
-        fields = super().get_fields(*args, **kwargs)
-        fields.pop('img', None)
-        return fields
-
 
 class TimePictureSerializer(serializers.ModelSerializer):
     url = serializers.URLField(source='get_absolute_url', read_only=True)
