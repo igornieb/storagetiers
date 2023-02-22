@@ -1,17 +1,16 @@
 # storagetiers
-This project uses Django and Django Rest Framework, Celery to run periodic tasks and Redis for cache.
+This project uses Django and Django Rest Framework, Celery to run periodic tasks, Redis for cache.
 
 ## Set-up
 You will need to install docker.
 
-Run terminal in project directory and type `docker compose up` command. If you want to turn on scheduled tasks enter storagetiers-web console and type `celery -A storagetiers worker -l INFO`
+Run terminal in project directory and type `docker compose up` command. If you want to turn on scheduled tasks enter storagetiers-web console and type `celery -A storagetiers beat -l INFO`. If you want to run with `DEBUG` off dont forget to collectstatic first.
 
 ## Tests
 
-To run tests enter storagetiers-web console and type in `python manage.py test`.
+To run tests enter storagetiers-web terminal and type in `python manage.py test`.
 
 ## API endpoints
-Permissions to images - all users uploaded pictures are private (users can view only their pictures) unless user decides to share image for given amount of time (create specific link). Then temporary link is generated and image is made available to everyone that has this link.
 
 Authentication - JWT token is used for authentication across API views.
 
@@ -121,11 +120,11 @@ Example output:
 
 #### GET
 
-Returns list of images shared by user
+Returns list of images shared by user. Requires authentication.
 
 Success code: `201`
 
-Error code: ```401 - authentication error```
+Error code: ```401 - authentication error, 404 - picture not found```
 
 Example output:
 
@@ -156,13 +155,14 @@ Success code: `200`
 Error codes:
 
 ```
-403 - authorization error
-403 - user Tier doesnt allow for this resolution
+401 - authorization error
+403 - owner tier doesnt allow to view at full resolution
+404 - not found
 ```
 
 #### POST
 
-Creates temporary link (available for specified amount of time from 300 to 30000 seconds) to image with given uuid.
+Creates temporary link (available for specified amount of time from 300 to 30000 seconds) to image with given uuid. Requires authentication.
 
 Success code: `200`
 
@@ -198,6 +198,7 @@ Success code: `200`
 Error codes:
 
 ```
+404 - picture not found
 403 - user Tier doesnt allow for this resolution
 401 - authentication error
 ```
