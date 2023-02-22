@@ -40,17 +40,24 @@ class PictureList(APIView):
 
 
 class PictureDetails(APIView):
+
     def get_permissions(self):
-        return [permissions.IsAuthenticated()]
+        return [permissions.IsAuthenticatedOrReadOnly()]
 
     def get_object(self, pk):
         try:
-            account = Account.objects.get(user=self.request.user)
-            return Picture.objects.get(pk=pk, owner=account)
+            return Picture.objects.get(pk=pk)
         except Picture.DoesNotExist:
             raise Http404
 
-    @method_decorator(cache_page(60 * 60))
+    def get_post_object(self, pk):
+        try:
+            user = Account.objects.get(user=self.request.user)
+            return Picture.objects.get(pk=pk, owner=user)
+        except Picture.DoesNotExist:
+            raise Http404
+
+    @method_decorator(cache_page(60 * 10))
     def get(self, request, pk, height=None):
         # returns image in given size
         picture = self.get_object(pk)
@@ -75,7 +82,7 @@ class PictureDetails(APIView):
 
     def post(self, request, pk, height=None):
         # creates new TimePicture object
-        picture = self.get_object(pk)
+        picture = self.get_post_object(pk)
         serializer = TimePictureShortSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save(picture=picture)
@@ -107,7 +114,7 @@ class TimePictureDetails(APIView):
         except TimePicture.DoesNotExist:
             raise Http404
 
-    @method_decorator(cache_page(60 * 20))
+    @method_decorator(cache_page(60 * 10))
     def get(self, request, pk):
         # returns shared image or 404 if image is already expired
         time_picture = self.get_object(pk)

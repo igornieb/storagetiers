@@ -135,44 +135,23 @@ class PictureDetailsTests(APITestCase):
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
-    def test_method_get_authorized(self):
-        # test get method when authenticated
+    def test_method_get(self):
+        # test get method
+        self.client.force_authenticate(user=None, token=None)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_method_get_fake_uuid(self):
         # test get method when authenticated, with uuid that doesnt exists
+        self.client.force_authenticate(user=None, token=None)
         response = self.client.get(reverse('picture-details', kwargs={'pk': '76807036-29ff-4f3a-a336-42bf2168ab27'}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
 
     def test_method_get_height_authorized(self):
         # test get method with height when authenticated
+        self.client.force_authenticate(user=None, token=None)
         response = self.client.get(self.url_height)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-
-    def test_method_get_unauthorized(self):
-        # test get method when unauthorized
-        self.account.tier = Tier.objects.get(name="Basic")
-        self.account.save()
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.account.tier = Tier.objects.get(name="Enterprise")
-        self.account.save()
-        self.client.force_authenticate(user=None, token=None)
-        response = self.client.get(self.url)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
-
-    def test_method_get_height_unauthorized(self):
-        # test get method when unauthorized
-        self.account.tier = Tier.objects.get(name="Basic")
-        self.account.save()
-        response = self.client.get(self.url_height)
-        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN)
-        self.account.tier = Tier.objects.get(name="Enterprise")
-        self.account.save()
-        self.client.force_authenticate(user=None, token=None)
-        response = self.client.get(self.url_height)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
 
 class TimePictureDetailsTest(APITestCase):
