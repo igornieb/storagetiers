@@ -110,7 +110,7 @@ class TimePictureList(APIView):
 class TimePictureDetails(APIView):
     def get_object(self, pk):
         try:
-            return TimePicture.objects.get(pk=pk)
+            return TimePicture.objects.get(pk=pk, expires__gt=timezone.now())
         except TimePicture.DoesNotExist:
             raise Http404
 
@@ -118,8 +118,4 @@ class TimePictureDetails(APIView):
     def get(self, request, pk):
         # returns shared image or 404 if image is already expired
         time_picture = self.get_object(pk)
-        time_picture.is_expired()
-        if time_picture.expired is False:
-            return HttpResponse(time_picture.picture.img, content_type="image/png")
-        else:
-            raise Http404
+        return HttpResponse(time_picture.picture.img, content_type="image/png")
