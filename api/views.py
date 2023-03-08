@@ -6,7 +6,6 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.utils.decorators import method_decorator
 from django.views.decorators.cache import cache_page
-from django.views.decorators.vary import vary_on_headers
 from core.models import Account, Picture
 from api.serializers import *
 from PIL import Image
@@ -78,7 +77,7 @@ class PictureDetails(APIView):
                 raise PermissionDenied({"message": "This picture cannot be displayed in its full resoution",
                                         "object": picture})
 
-    def post(self, request, pk, height=None):
+    def post(self, request, pk):
         # creates new TimePicture object
         picture = self.get_post_object(pk)
         serializer = TimePictureShortSerializer(data=request.data)
@@ -112,7 +111,7 @@ class TimePictureDetails(APIView):
         except TimePicture.DoesNotExist:
             raise Http404
 
-    @method_decorator(cache_page(60 * 10))
+    @method_decorator(cache_page(10))
     def get(self, request, pk):
         # returns shared image or 404 if image is already expired
         time_picture = self.get_object(pk)
