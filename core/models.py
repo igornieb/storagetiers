@@ -1,12 +1,11 @@
 import uuid
 from django.utils import timezone
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.core.validators import FileExtensionValidator
 from django.contrib.auth.models import User
 from django.db import models
 from django.urls import reverse
 from core.utilis import validate_sizes_allowed, validate_time_allowed
-from storagetiers.settings import MEDIA_ROOT
 
 
 class Tier(models.Model):
@@ -45,7 +44,7 @@ class Picture(models.Model):
         return f"{self.name} - {self.owner}"
 
     def upload_to(self, filename):
-        return f"media/{self.owner.user}/{filename}"
+        return f"user-pictures/{self.owner.user}/{filename}"
 
     def get_absolute_url(self):
         # get posible res, create dicts
@@ -89,7 +88,7 @@ class TimePicture(models.Model):
         time_left = (self.expires - timezone.now()).total_seconds()
         if time_left < 0:
             return "Expired"
-        return time_left
+        return round(time_left)
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     picture = models.ForeignKey(Picture, on_delete=models.CASCADE)
