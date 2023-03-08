@@ -59,15 +59,16 @@ class PictureListTests(APITestCase):
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_method_post_authenticated_valid(self):
-        img = SimpleUploadedFile(name='test_image.png', content=open("test_image.png", 'rb').read(),
+        img = SimpleUploadedFile(name='test_image.png', content=open("media/test_image.png", 'rb').read(),
                                  content_type='image/png')
         data = {
             'name': "test",
             'img': img
         }
         response = self.client.post(self.url, data, format="multipart")
+        serializer = PictureAddSerializer(Picture.objects.get(name='test'))
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['name'], "test")
+        self.assertEqual(response.data, serializer.data)
 
     def test_method_post_authenticated_invalid(self):
         data = {
@@ -76,6 +77,7 @@ class PictureListTests(APITestCase):
         }
         response = self.client.post(self.url, data, format="multipart")
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(False, Picture.objects.filter(name="test").exists())
 
 
 class TimePictureListTest(APITestCase):
@@ -88,17 +90,24 @@ class TimePictureListTest(APITestCase):
         self.token = Token.objects.create(user=self.user)
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
-        picture = Picture.objects.create(owner=Account.objects.get(user=self.user), img="imgmock.png")
-        TimePicture.objects.create(picture=picture, time=400)
+        self.picture = Picture.objects.create(owner=Account.objects.get(user=self.user), img="imgmock.png")
+        TimePicture.objects.create(picture=self.picture, time=400)
 
     def test_method_get_authorized(self):
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
+        query = TimePicture.objects.filter(picture__owner=Account.objects.get(user=self.user))
+        serializer = TimePictureSerializer(query, many=True)
+        self.assertEqual(response.data, serializer.data)
 
     def test_method_get_unauthenticated(self):
         self.client.force_authenticate(user=None, token=None)
         response = self.client.get(self.url)
+        data = {
+            "detail": "Authentication credentials were not provided."
+            }
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(response.data, data)
 
 
 class PictureDetailsTests(APITestCase):
@@ -109,7 +118,7 @@ class PictureDetailsTests(APITestCase):
         self.account.tier = Tier.objects.get(name="Enterprise")
         self.account.save()
         self.picture = Picture.objects.create(owner=self.account, img="image.jpg")
-        self.picture.img = SimpleUploadedFile(name='test_image.jpg', content=open("test_image.png", 'rb').read(),
+        self.picture.img = SimpleUploadedFile(name='test_image.jpg', content=open("media/test_image.png", 'rb').read(),
                                               content_type='image/jpeg')
         self.picture.save()
         self.uuid = self.picture.id
@@ -124,9 +133,10 @@ class PictureDetailsTests(APITestCase):
             'time': 800
         }
         response = self.client.post(self.url, data, format='json')
+        object = TimePicture.objects.filter(time=800).first()
+        serializer = TimePictureShortSerializer(object)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
-        self.assertEqual(response.data['time'], 800)
-        self.assertEqual(response.data["picture"], PictureSerializer(self.picture).data)
+        self.assertEqual(response.data, serializer.data)
 
     def test_method_post_authenticated_invalid(self):
         # tests creating timelinks (invalid data)
@@ -135,6 +145,7 @@ class PictureDetailsTests(APITestCase):
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertEqual(False, TimePicture.objects.filter(time=1).exists())
 
     def test_method_post_unauthenticated(self):
         # tests creating timelinks (unauthorized)
@@ -144,22 +155,22 @@ class PictureDetailsTests(APITestCase):
         }
         response = self.client.post(self.url, data, format='json')
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED)
+        self.assertEqual(False, TimePicture.objects.filter(time=800).exists())
 
     def test_method_get(self):
         # test get method
-        self.client.force_authenticate(user=None, token=None)
         response = self.client.get(self.url)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
     def test_method_get_fake_uuid(self):
-        # test get method when authenticated, with uuid that doesnt exists
-        self.client.force_authenticate(user=None, token=None)
+        # test get method with uuid that doesnt exists
         response = self.client.get(reverse('picture-details', kwargs={'pk': '76807036-29ff-4f3a-a336-42bf2168ab27'}))
+        response_height = self.client.get(reverse('picture-details', kwargs={'pk': '76807036-29ff-4f3a-a336-42bf2168ab27', 'height':400}))
         self.assertEqual(response.status_code, status.HTTP_404_NOT_FOUND)
+        self.assertEqual(response_height.status_code, status.HTTP_404_NOT_FOUND)
 
-    def test_method_get_height_authorized(self):
-        # test get method with height when authenticated
-        self.client.force_authenticate(user=None, token=None)
+    def test_method_get_height(self):
+        # test get method with height
         response = self.client.get(self.url_height)
         self.assertEqual(response.status_code, status.HTTP_200_OK)
 
@@ -172,7 +183,7 @@ class TimePictureDetailsTest(APITestCase):
         self.client.credentials(HTTP_AUTHORIZATION='Token ' + self.token.key)
 
         picture = Picture.objects.create(owner=Account.objects.get(user=self.user), img="imgmock.png")
-        picture.img = SimpleUploadedFile(name='test_image.jpg', content=open("test_image.png", 'rb').read(),
+        picture.img = SimpleUploadedFile(name='test_image.jpg', content=open("media/test_image.png", 'rb').read(),
                                          content_type='image/jpeg')
         picture.save()
         self.picture_good = TimePicture.objects.create(picture=picture, time=400)
